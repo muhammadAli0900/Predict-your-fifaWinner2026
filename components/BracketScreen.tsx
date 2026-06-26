@@ -6,7 +6,7 @@ import type { MatchVenue } from '@/lib/data'
 import { teamsOf, better, rank } from '@/lib/bracketEngine'
 import type { AppState } from '@/lib/types'
 
-const H = 1280
+const H = 1600
 
 const ROUNDS: { key: string; label: string }[] = [
   { key: 'R32', label: 'Round of 32' },
@@ -173,7 +173,7 @@ export default function BracketScreen({
             <div key={i} style={col.colStyle}>
               {col.type === 'round' &&
                 col.matches!.map(m => (
-                  <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <div key={m.id} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
                     {m.venue && (
                       <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
                     )}
@@ -522,7 +522,7 @@ function buildColumns(
 
     if (ri < ROUNDS.length - 1) {
       const cnt = n / 2
-      const ch = H / cnt  // each bracket cell spans exactly 2 source-round slots
+      const ch = H / n  // one source-round slot height — centers brackets on card midpoints
       const cells = Array.from({ length: cnt }, () => ({
         style: {
           height: ch,
