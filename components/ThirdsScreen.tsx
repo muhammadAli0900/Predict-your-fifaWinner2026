@@ -111,20 +111,19 @@ export default function ThirdsScreen({
         </div>
         <button
           onClick={onContinue}
-          disabled={!ok}
           style={{
             fontFamily: "'Ubuntu', sans-serif",
             fontWeight: 500,
             fontSize: 14,
             padding: '10px 20px',
             borderRadius: 10,
-            cursor: ok ? 'pointer' : 'not-allowed',
-            background: ok ? '#c0892b' : '#e6dcc6',
-            color: ok ? '#fff' : '#b3a98f',
+            cursor: 'pointer',
+            background: ok ? '#c0892b' : '#5a7cc9',
+            color: '#fff',
             border: 'none',
           }}
         >
-          Build the bracket →
+          {ok ? 'Build the bracket →' : `Continue with ${count}/8 →`}
         </button>
       </div>
 

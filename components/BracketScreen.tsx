@@ -1,11 +1,12 @@
 'use client'
 import React from 'react'
 import Flag from './Flag'
-import { ROUND_N } from '@/lib/data'
+import { ROUND_N, VENUES } from '@/lib/data'
+import type { MatchVenue } from '@/lib/data'
 import { teamsOf, better, rank } from '@/lib/bracketEngine'
 import type { AppState } from '@/lib/types'
 
-const H = 1160
+const H = 1280
 
 const ROUNDS: { key: string; label: string }[] = [
   { key: 'R32', label: 'Round of 32' },
@@ -172,57 +173,74 @@ export default function BracketScreen({
             <div key={i} style={col.colStyle}>
               {col.type === 'round' &&
                 col.matches!.map(m => (
-                  <div key={m.id} style={m.cardStyle}>
-                    <BracketTeamRow
-                      team={m.top.team}
-                      picked={m.top.picked}
-                      decided={m.top.decided}
-                      empty={m.top.empty}
-                      locked={m.top.locked}
-                      onClick={m.top.onClick}
-                    />
-                    <div style={{ height: 1, background: '#ece2cf' }} />
-                    <BracketTeamRow
-                      team={m.bot.team}
-                      picked={m.bot.picked}
-                      decided={m.bot.decided}
-                      empty={m.bot.empty}
-                      locked={m.bot.locked}
-                      onClick={m.bot.onClick}
-                    />
+                  <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <div style={m.cardStyle}>
+                      <BracketTeamRow
+                        team={m.top.team}
+                        picked={m.top.picked}
+                        decided={m.top.decided}
+                        empty={m.top.empty}
+                        locked={m.top.locked}
+                        onClick={m.top.onClick}
+                      />
+                      <div style={{ height: 1, background: '#ece2cf' }} />
+                      <BracketTeamRow
+                        team={m.bot.team}
+                        picked={m.bot.picked}
+                        decided={m.bot.decided}
+                        empty={m.bot.empty}
+                        locked={m.bot.locked}
+                        onClick={m.bot.onClick}
+                      />
+                    </div>
+                    {m.venue && (
+                      <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
+                    )}
                   </div>
                 ))}
               {col.type === 'gutter' &&
                 col.cells!.map((cell, ci) => <div key={ci} style={cell.style} />)}
               {col.type === 'champ' && (
-                <div style={champBoxStyle}>
-                  <div
-                    style={{
-                      fontFamily: "'Roboto Condensed', sans-serif",
-                      fontSize: 11,
-                      letterSpacing: '.2em',
-                      color: '#e8c25f',
-                    }}
-                  >
-                    CHAMPION
+                <div>
+                  <div style={champBoxStyle}>
+                    <div
+                      style={{
+                        fontFamily: "'Roboto Condensed', sans-serif",
+                        fontSize: 11,
+                        letterSpacing: '.2em',
+                        color: '#e8c25f',
+                      }}
+                    >
+                      CHAMPION
+                    </div>
+                    <div className="p26-anim-pop" style={{ fontSize: 40, marginTop: 8 }}>
+                      🏆
+                    </div>
+                    <div style={{ fontSize: 30, marginTop: 6 }}>
+                      {champ ? <Flag name={champ} height="1.4em" /> : <span style={{ opacity: 0.4 }}>🏳️</span>}
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "'Ubuntu', sans-serif",
+                        fontWeight: 700,
+                        fontSize: 18,
+                        marginTop: 4,
+                        color: '#fff',
+                      }}
+                    >
+                      {champ ?? 'TBD'}
+                    </div>
                   </div>
-                  <div className="p26-anim-pop" style={{ fontSize: 40, marginTop: 8 }}>
-                    🏆
-                  </div>
-                  <div style={{ fontSize: 30, marginTop: 6 }}>
-                    {champ ? <Flag name={champ} height="1.4em" /> : <span style={{ opacity: 0.4 }}>🏳️</span>}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "'Ubuntu', sans-serif",
-                      fontWeight: 700,
-                      fontSize: 18,
-                      marginTop: 4,
-                      color: '#fff',
-                    }}
-                  >
-                    {champ ?? 'TBD'}
-                  </div>
+                  {VENUES['F-0'] && (
+                    <div style={{ marginTop: 8 }}>
+                      <VenueTag
+                        date={VENUES['F-0'].date}
+                        stadium={VENUES['F-0'].stadium}
+                        city={VENUES['F-0'].city}
+                        country={VENUES['F-0'].country}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -305,6 +323,8 @@ function ThirdPlacePlayoff({
     return { team, picked, decided, empty: !team, locked: tpLocked }
   }
 
+  const tpVenue = VENUES['TP-0']
+
   return (
     <div style={{ maxWidth: 440, margin: '24px auto 0' }}>
       <div
@@ -346,11 +366,44 @@ function ThirdPlacePlayoff({
           )
         })}
       </div>
+      {tpVenue && (
+        <div style={{ marginTop: 6 }}>
+          <VenueTag date={tpVenue.date} stadium={tpVenue.stadium} city={tpVenue.city} country={tpVenue.country} />
+        </div>
+      )}
       <div
         style={{ textAlign: 'center', fontSize: 13, color: '#a3946c', marginTop: 8 }}
       >
         The two beaten semifinalists meet for the bronze medal.
       </div>
+    </div>
+  )
+}
+
+function VenueTag({ date, stadium, city, country }: { date: string; stadium: string; city: string; country: string }) {
+  const flag = country === 'USA' ? '🇺🇸' : country === 'Mexico' ? '🇲🇽' : '🇨🇦'
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '3px 8px',
+        background: '#f0ebe0',
+        border: '1px solid #e4d9be',
+        borderRadius: 6,
+        fontSize: 10,
+        color: '#7a7062',
+        lineHeight: 1.25,
+        overflow: 'hidden',
+      }}
+    >
+      <span style={{ fontSize: 11, flex: '0 0 auto' }}>{flag}</span>
+      <span style={{ fontWeight: 700, color: '#c0892b', flex: '0 0 auto' }}>{date}</span>
+      <span style={{ flex: '0 0 auto', color: '#b3a98f' }}>·</span>
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{stadium}</span>
+      <span style={{ flex: '0 0 auto', color: '#b3a98f' }}>·</span>
+      <span style={{ flex: '0 0 auto', whiteSpace: 'nowrap' }}>{city}</span>
     </div>
   )
 }
@@ -403,6 +456,7 @@ type BracketMatch = {
   cardStyle: React.CSSProperties
   top: MatchSide
   bot: MatchSide
+  venue?: MatchVenue
 }
 
 type Column =
@@ -449,6 +503,7 @@ function buildColumns(
         },
         top: mkSide(t[0]),
         bot: mkSide(t[1]),
+        venue: VENUES[id],
       })
     }
 

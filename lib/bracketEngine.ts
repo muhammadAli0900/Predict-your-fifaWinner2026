@@ -15,26 +15,32 @@ export function groupStandings(
   g: string,
   state: Pick<AppState, 'approach' | 'matchPicks' | 'ranks'>,
   officialResults: Record<string, string> = {}
-): { order: string[]; complete: boolean } {
+): { order: string[]; complete: boolean; pts: Record<string, number> } {
   const teams = GROUPS[g]
 
   if (state.approach === 'match') {
-    const wins: Record<string, number> = {}
-    teams.forEach(t => (wins[t] = 0))
+    const pts: Record<string, number> = {}
+    teams.forEach(t => (pts[t] = 0))
     let done = 0
     PAIRS.forEach((p, i) => {
       const w = officialResults[`${g}-${i}`] ?? state.matchPicks[`${g}-${i}`]
-      if (w === 'DRAW') { done++ }
-      else if (w) { wins[w]++; done++ }
+      if (w === 'DRAW') {
+        pts[teams[p[0]]] += 1
+        pts[teams[p[1]]] += 1
+        done++
+      } else if (w) {
+        pts[w] = (pts[w] || 0) + 3
+        done++
+      }
     })
-    const order = [...teams].sort((a, b) => (wins[b] - wins[a]) || rank(a) - rank(b))
-    return { order, complete: done === 6 }
+    const order = [...teams].sort((a, b) => (pts[b] - pts[a]) || rank(a) - rank(b))
+    return { order, complete: done === 6, pts }
   }
 
   // standings mode
   const r = state.ranks[g] || []
   const rest = teams.filter(t => !r.includes(t))
-  return { order: [...r, ...rest], complete: r.length >= 3 }
+  return { order: [...r, ...rest], complete: r.length >= 3, pts: {} }
 }
 
 export function allComplete(
@@ -65,31 +71,39 @@ export function suggested(
   state: Pick<AppState, 'approach' | 'matchPicks' | 'ranks'>,
   officialResults: Record<string, string> = {}
 ): string[] {
-  return [...thirdsList(state, officialResults)]
-    .sort((a, b) => rank(a.team) - rank(b.team))
+  return GKEYS
+    .map(g => {
+      const st = groupStandings(g, state, officialResults)
+      const team = st.order[2]
+      return { group: g, team, pts: team ? (st.pts[team] ?? 0) : -1 }
+    })
+    .sort((a, b) => (b.pts - a.pts) || rank(a.team) - rank(b.team))
     .slice(0, 8)
     .map(x => x.team)
 }
 
 export function assignThirds(state: StateSlice, officialResults: Record<string, string> = {}): Record<number, string | null> {
   const res = results(state, officialResults)
-  const sel =
-    state.thirds && state.thirds.length === 8
-      ? state.thirds
-      : suggested(state, officialResults)
+
+  // Merge user-selected with auto-suggested to always aim for 8
+  const userSel = state.thirds && state.thirds.length > 0 ? state.thirds : []
+  const auto = suggested(state, officialResults)
+  const merged = [...userSel, ...auto].filter((t, i, arr) => arr.indexOf(t) === i).slice(0, 8)
+  const sel = merged.length > 0 ? merged : auto
 
   const items = sel.map(t => ({
     team: t,
     group: GKEYS.find(g => res[g][2] === t) || '',
   }))
-  const slots = THIRD_SLOTS.map(s => ({ idx: s[0], avoid: s[1], team: null as string | null }))
+  // Use allow lists: third-place team must be from one of the allowed groups for that slot
+  const slots = THIRD_SLOTS.map(s => ({ idx: s[0], allow: s[1], team: null as string | null }))
   const used = new Array(items.length).fill(false)
 
   const bt = (si: number): boolean => {
     if (si === slots.length) return true
     for (let k = 0; k < items.length; k++) {
       if (used[k]) continue
-      if (slots[si].avoid.includes(items[k].group)) continue
+      if (!slots[si].allow.includes(items[k].group)) continue
       used[k] = true
       slots[si].team = items[k].team
       if (bt(si + 1)) return true
@@ -100,9 +114,10 @@ export function assignThirds(state: StateSlice, officialResults: Record<string, 
   }
 
   if (!bt(0)) {
+    // Fallback: assign in order, ignoring allow constraints
     let k = 0
     slots.forEach(s => {
-      while (used[k]) k++
+      while (k < items.length && used[k]) k++
       s.team = items[k]?.team ?? null
       if (items[k]) used[k] = true
     })

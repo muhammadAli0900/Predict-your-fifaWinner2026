@@ -197,8 +197,8 @@ export default function Home() {
   const accMap: Record<Screen, boolean> = {
     welcome: true,
     groups: !!state.approach,
-    thirds: !!state.approach && isDone,
-    bracket: !!state.approach && isDone,
+    thirds: !!state.approach,
+    bracket: !!state.approach,
     results: hasChamp,
   }
 

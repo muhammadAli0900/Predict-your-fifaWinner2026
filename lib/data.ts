@@ -122,25 +122,79 @@ export const PAIRS: [number, number][] = [
   [0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2],
 ]
 
-// R32 bracket skeleton — hand-verified, no same-group clashes before QF
+// R32 bracket — official FIFA 2026 structure (matches 73-88)
 export const R32: [string, string][] = [
-  ['1H', 'T'], ['2C', '2F'], ['1A', 'T'], ['1B', '2E'],
-  ['1I', 'T'], ['2G', '2K'], ['1C', 'T'], ['1D', '2A'],
-  ['1L', 'T'], ['2B', '2D'], ['1E', 'T'], ['1F', '2J'],
-  ['1J', 'T'], ['2H', '2L'], ['1K', 'T'], ['1G', '2I'],
+  ['2A', '2B'], // R32-0: Match 73
+  ['1E', 'T'],  // R32-1: Match 74
+  ['1F', '2C'], // R32-2: Match 75
+  ['1C', '2F'], // R32-3: Match 76
+  ['1I', 'T'],  // R32-4: Match 77
+  ['2E', '2I'], // R32-5: Match 78
+  ['1A', 'T'],  // R32-6: Match 79
+  ['1L', 'T'],  // R32-7: Match 80
+  ['1D', 'T'],  // R32-8: Match 81
+  ['1G', 'T'],  // R32-9: Match 82
+  ['2K', '2L'], // R32-10: Match 83
+  ['1H', '2J'], // R32-11: Match 84
+  ['1B', 'T'],  // R32-12: Match 85
+  ['1J', '2H'], // R32-13: Match 86
+  ['1K', 'T'],  // R32-14: Match 87
+  ['2D', '2G'], // R32-15: Match 88
 ]
 
-// Third-place wildcard slot definitions [R32 slot index, groups to avoid]
+// Third-place wildcard slots [R32 slot index, allowed groups per FIFA combination table]
 export const THIRD_SLOTS: [number, string[]][] = [
-  [0,  ['H', 'C', 'F']],
-  [2,  ['A', 'B', 'E']],
-  [4,  ['I', 'G', 'K']],
-  [6,  ['C', 'D', 'A']],
-  [8,  ['L', 'B', 'D']],
-  [10, ['E', 'F', 'J']],
-  [12, ['J', 'H', 'L']],
-  [14, ['K', 'G', 'I']],
+  [1,  ['A', 'B', 'C', 'D', 'F']],
+  [4,  ['C', 'D', 'F', 'G', 'H']],
+  [6,  ['C', 'E', 'F', 'H', 'I']],
+  [7,  ['E', 'H', 'I', 'J', 'K']],
+  [8,  ['B', 'E', 'F', 'I', 'J']],
+  [9,  ['A', 'E', 'H', 'I', 'J']],
+  [12, ['E', 'F', 'G', 'I', 'J']],
+  [14, ['D', 'E', 'I', 'J', 'L']],
 ]
+
+export interface MatchVenue {
+  date: string
+  stadium: string
+  city: string
+  country: string
+}
+
+export const VENUES: Record<string, MatchVenue> = {
+  'R32-0':  { date: 'Jun 28', stadium: 'SoFi Stadium',              city: 'Los Angeles',       country: 'USA'    },
+  'R32-1':  { date: 'Jun 29', stadium: 'Gillette Stadium',           city: 'Boston',            country: 'USA'    },
+  'R32-2':  { date: 'Jun 29', stadium: 'Estadio BBVA',               city: 'Monterrey',         country: 'Mexico' },
+  'R32-3':  { date: 'Jun 29', stadium: 'NRG Stadium',                city: 'Houston',           country: 'USA'    },
+  'R32-4':  { date: 'Jun 30', stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },
+  'R32-5':  { date: 'Jun 30', stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R32-6':  { date: 'Jun 30', stadium: 'Estadio Azteca',             city: 'Mexico City',       country: 'Mexico' },
+  'R32-7':  { date: 'Jul 1',  stadium: 'Mercedes-Benz Stadium',      city: 'Atlanta',           country: 'USA'    },
+  'R32-8':  { date: 'Jul 1',  stadium: "Levi's Stadium",             city: 'San Francisco',     country: 'USA'    },
+  'R32-9':  { date: 'Jul 1',  stadium: 'Lumen Field',                city: 'Seattle',           country: 'USA'    },
+  'R32-10': { date: 'Jul 2',  stadium: 'BMO Field',                  city: 'Toronto',           country: 'Canada' },
+  'R32-11': { date: 'Jul 2',  stadium: 'SoFi Stadium',               city: 'Los Angeles',       country: 'USA'    },
+  'R32-12': { date: 'Jul 2',  stadium: 'BC Place',                   city: 'Vancouver',         country: 'Canada' },
+  'R32-13': { date: 'Jul 3',  stadium: 'Hard Rock Stadium',          city: 'Miami',             country: 'USA'    },
+  'R32-14': { date: 'Jul 3',  stadium: 'Arrowhead Stadium',          city: 'Kansas City',       country: 'USA'    },
+  'R32-15': { date: 'Jul 3',  stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R16-0':  { date: 'Jul 4',  stadium: 'Lincoln Financial Field',    city: 'Philadelphia',      country: 'USA'    },
+  'R16-1':  { date: 'Jul 4',  stadium: 'NRG Stadium',                city: 'Houston',           country: 'USA'    },
+  'R16-2':  { date: 'Jul 5',  stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },
+  'R16-3':  { date: 'Jul 5',  stadium: 'Estadio Azteca',             city: 'Mexico City',       country: 'Mexico' },
+  'R16-4':  { date: 'Jul 6',  stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R16-5':  { date: 'Jul 6',  stadium: 'Lumen Field',                city: 'Seattle',           country: 'USA'    },
+  'R16-6':  { date: 'Jul 7',  stadium: 'Mercedes-Benz Stadium',      city: 'Atlanta',           country: 'USA'    },
+  'R16-7':  { date: 'Jul 7',  stadium: 'BC Place',                   city: 'Vancouver',         country: 'Canada' },
+  'QF-0':   { date: 'Jul 9',  stadium: 'Gillette Stadium',           city: 'Boston',            country: 'USA'    },
+  'QF-1':   { date: 'Jul 10', stadium: 'SoFi Stadium',               city: 'Los Angeles',       country: 'USA'    },
+  'QF-2':   { date: 'Jul 11', stadium: 'Hard Rock Stadium',          city: 'Miami',             country: 'USA'    },
+  'QF-3':   { date: 'Jul 11', stadium: 'Arrowhead Stadium',          city: 'Kansas City',       country: 'USA'    },
+  'SF-0':   { date: 'Jul 14', stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'SF-1':   { date: 'Jul 15', stadium: 'Mercedes-Benz Stadium',      city: 'Atlanta',           country: 'USA'    },
+  'TP-0':   { date: 'Jul 18', stadium: 'Hard Rock Stadium',          city: 'Miami',             country: 'USA'    },
+  'F-0':    { date: 'Jul 19', stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },
+}
 
 export const ROUND_N: Record<string, number> = {
   R32: 16, R16: 8, QF: 4, SF: 2, F: 1,
