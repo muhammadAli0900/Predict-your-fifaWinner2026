@@ -1,5 +1,5 @@
 import { GROUPS, TEAM, PAIRS, R32, THIRD_SLOTS, GKEYS } from './data'
-import type { AppState } from './types'
+import type { AppState, GroupStat } from './types'
 
 type StateSlice = Pick<AppState, 'approach' | 'matchPicks' | 'ranks' | 'thirds'>
 
@@ -67,17 +67,40 @@ export function thirdsList(
   return GKEYS.map(g => ({ group: g, team: res[g][2] }))
 }
 
+// FIFA third-place conduct score: lower = better discipline
+function conductPenalty(stat: GroupStat): number {
+  // yellow=-1, second-yellow red=-3, direct red=-4, yellow+direct red=-5
+  // We can't distinguish red types from a simple count, so use -3 per red as an average
+  return stat.yellow_cards + stat.red_cards * 3
+}
+
 export function suggested(
   state: Pick<AppState, 'approach' | 'matchPicks' | 'ranks'>,
-  officialResults: Record<string, string> = {}
+  officialResults: Record<string, string> = {},
+  groupStats: Record<string, GroupStat> = {}
 ): string[] {
   return GKEYS
     .map(g => {
       const st = groupStandings(g, state, officialResults)
       const team = st.order[2]
-      return { group: g, team, pts: team ? (st.pts[team] ?? 0) : -1 }
+      const stat = groupStats[team]
+      return {
+        team,
+        // Use real API stats when available, fall back to predicted points
+        pts:     stat ? stat.points    : (team ? (st.pts[team] ?? 0) : -1),
+        gd:      stat ? stat.goal_diff : 0,
+        gf:      stat ? stat.goals_for : 0,
+        conduct: stat ? conductPenalty(stat) : 0,
+        rank:    rank(team),
+      }
     })
-    .sort((a, b) => (b.pts - a.pts) || rank(a.team) - rank(b.team))
+    .sort((a, b) =>
+      (b.pts - a.pts) ||
+      (b.gd - a.gd) ||
+      (b.gf - a.gf) ||
+      (a.conduct - b.conduct) ||   // lower penalty = better = sorted first
+      (a.rank - b.rank)
+    )
     .slice(0, 8)
     .map(x => x.team)
 }

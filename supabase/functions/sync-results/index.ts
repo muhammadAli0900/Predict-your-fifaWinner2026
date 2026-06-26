@@ -36,17 +36,24 @@ const FIFA_RANK: Record<string, number> = {
 
 const PAIRS: [number, number][] = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]]
 
-// R32 bracket skeleton — must stay in sync with the app
+// R32 bracket — official FIFA 2026 structure (matches 73-88)
 const R32: [string, string][] = [
-  ['1H','T'],['2C','2F'],['1A','T'],['1B','2E'],
-  ['1I','T'],['2G','2K'],['1C','T'],['1D','2A'],
-  ['1L','T'],['2B','2D'],['1E','T'],['1F','2J'],
-  ['1J','T'],['2H','2L'],['1K','T'],['1G','2I'],
+  ['2A','2B'], ['1E','T'],  ['1F','2C'], ['1C','2F'],
+  ['1I','T'],  ['2E','2I'], ['1A','T'],  ['1L','T'],
+  ['1D','T'],  ['1G','T'],  ['2K','2L'], ['1H','2J'],
+  ['1B','T'],  ['1J','2H'], ['1K','T'],  ['2D','2G'],
 ]
 
+// [slot index, allowed groups] per FIFA combination table
 const THIRD_SLOTS: [number, string[]][] = [
-  [0,['H','C','F']], [2,['A','B','E']], [4,['I','G','K']], [6,['C','D','A']],
-  [8,['L','B','D']], [10,['E','F','J']], [12,['J','H','L']], [14,['K','G','I']],
+  [1,  ['A','B','C','D','F']],
+  [4,  ['C','D','F','G','H']],
+  [6,  ['C','E','F','H','I']],
+  [7,  ['E','H','I','J','K']],
+  [8,  ['B','E','F','I','J']],
+  [9,  ['A','E','H','I','J']],
+  [12, ['E','F','G','I','J']],
+  [14, ['D','E','I','J','L']],
 ]
 
 const GKEYS = ['A','B','C','D','E','F','G','H','I','J','K','L']
@@ -75,6 +82,7 @@ const API_TO_OUR: Record<string, string> = {
   'Curaçao': 'Curacao',
   // Cape Verde
   'Cabo Verde': 'Cape Verde',
+  'Cape Verde Islands': 'Cape Verde',
   // Czechia
   'Czech Republic': 'Czechia',
   // Turkey
@@ -118,13 +126,18 @@ function computeGroupStandings(
   officialResults: Record<string, string>
 ): string[] {
   const teams = GROUPS[g]
-  const wins: Record<string, number> = {}
-  teams.forEach(t => (wins[t] = 0))
-  PAIRS.forEach((_p, i) => {
+  const pts: Record<string, number> = {}
+  teams.forEach(t => (pts[t] = 0))
+  PAIRS.forEach((p, i) => {
     const w = officialResults[`${g}-${i}`]
-    if (w && w !== 'DRAW') wins[w] = (wins[w] ?? 0) + 1
+    if (w === 'DRAW') {
+      pts[teams[p[0]]] = (pts[teams[p[0]]] || 0) + 1
+      pts[teams[p[1]]] = (pts[teams[p[1]]] || 0) + 1
+    } else if (w) {
+      pts[w] = (pts[w] || 0) + 3
+    }
   })
-  return [...teams].sort((a, b) => (wins[b] - wins[a]) || rankOf(a) - rankOf(b))
+  return [...teams].sort((a, b) => (pts[b] - pts[a]) || rankOf(a) - rankOf(b))
 }
 
 function assignThirds(
@@ -135,14 +148,14 @@ function assignThirds(
     team: t,
     group: GKEYS.find(g => standings[g][2] === t) ?? '',
   }))
-  const slots = THIRD_SLOTS.map(s => ({ idx: s[0], avoid: s[1], team: null as string | null }))
+  const slots = THIRD_SLOTS.map(s => ({ idx: s[0], allow: s[1], team: null as string | null }))
   const used = new Array(items.length).fill(false)
 
   const bt = (si: number): boolean => {
     if (si === slots.length) return true
     for (let k = 0; k < items.length; k++) {
       if (used[k]) continue
-      if (slots[si].avoid.includes(items[k].group)) continue
+      if (!slots[si].allow.includes(items[k].group)) continue
       used[k] = true
       slots[si].team = items[k].team
       if (bt(si + 1)) return true
@@ -399,7 +412,77 @@ Deno.serve(async (_req: Request) => {
       log(`  ✓ ${matchId} → ${winner}`)
     }
 
-    // 5. Upsert into Supabase ─────────────────────────────────────────────────
+    // 5. Compute and upsert group_stats from finished group-stage matches ───────
+    const perTeam: Record<string, {
+      group_key: string; matches: number; pts: number
+      gf: number; ga: number; yc: number; rc: number
+    }> = {}
+
+    for (const match of matches) {
+      if ((match.stage as string) !== 'GROUP_STAGE') continue
+
+      const homeRaw  = (match.homeTeam as Record<string, string>)?.name ?? ''
+      const awayRaw  = (match.awayTeam as Record<string, string>)?.name ?? ''
+      const home = normalise(homeRaw)
+      const away = normalise(awayRaw)
+      if (!ALL_OUR_TEAMS.has(home) || !ALL_OUR_TEAMS.has(away)) continue
+
+      const letter = groupLetter(match.group as string)
+      if (!letter) continue
+
+      const sc = match.score as Record<string, unknown>
+      const ft = sc?.fullTime as Record<string, number | null> | null
+      const hg = ft?.home ?? null
+      const ag = ft?.away ?? null
+      const wSide = (sc?.winner as string) ?? null
+      if (hg === null || ag === null || !wSide) continue
+
+      const init = (t: string, g: string) => {
+        if (!perTeam[t]) perTeam[t] = { group_key: g, matches: 0, pts: 0, gf: 0, ga: 0, yc: 0, rc: 0 }
+      }
+      init(home, letter); init(away, letter)
+      perTeam[home].matches++; perTeam[away].matches++
+      perTeam[home].gf += hg; perTeam[home].ga += ag
+      perTeam[away].gf += ag; perTeam[away].ga += hg
+      if (wSide === 'HOME_TEAM') { perTeam[home].pts += 3 }
+      else if (wSide === 'AWAY_TEAM') { perTeam[away].pts += 3 }
+      else { perTeam[home].pts += 1; perTeam[away].pts += 1 }
+
+      // Cards (present on free tier when fetching individual matches, optional here)
+      const bookings = (match as Record<string, unknown>).bookings as Array<Record<string, unknown>> | undefined
+      if (Array.isArray(bookings)) {
+        for (const b of bookings) {
+          const cardTeam = normalise((b.team as Record<string, string>)?.name ?? '')
+          if (!perTeam[cardTeam]) continue
+          const card = b.card as string
+          if (card === 'YELLOW_CARD') perTeam[cardTeam].yc++
+          else if (card === 'RED_CARD' || card === 'YELLOW_RED_CARD') perTeam[cardTeam].rc++
+        }
+      }
+    }
+
+    const statsUpserts = Object.entries(perTeam).map(([team, s]) => ({
+      team,
+      group_key:     s.group_key,
+      matches_played: s.matches,
+      points:        s.pts,
+      goals_for:     s.gf,
+      goals_against: s.ga,
+      goal_diff:     s.gf - s.ga,
+      yellow_cards:  s.yc,
+      red_cards:     s.rc,
+      updated_at:    new Date().toISOString(),
+    }))
+
+    if (statsUpserts.length > 0) {
+      const { error: statsErr } = await supabase
+        .from('group_stats')
+        .upsert(statsUpserts, { onConflict: 'team' })
+      if (statsErr) log(`⚠ group_stats upsert: ${statsErr.message}`)
+      else log(`✓ group_stats updated for ${statsUpserts.length} teams`)
+    }
+
+    // 6. Upsert official_results into Supabase ────────────────────────────────
     if (upserts.length > 0) {
       const { error: upsertErr } = await supabase
         .from('official_results')
@@ -415,9 +498,10 @@ Deno.serve(async (_req: Request) => {
       total_from_api: matches.length,
       mapped: upserts.length,
       skipped,
+      group_stats_teams: statsUpserts.length,
       results: upserts.map(u => `${u.match_id}=${u.winner}`),
     }
-    log(`Done: ${upserts.length} upserted, ${skipped} skipped`)
+    log(`Done: ${upserts.length} results upserted, ${statsUpserts.length} teams stats updated, ${skipped} skipped`)
     return json(summary)
 
   } catch (err) {

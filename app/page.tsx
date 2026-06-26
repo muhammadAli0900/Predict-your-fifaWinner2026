@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { AppState, Screen } from '@/lib/types'
+import type { AppState, Screen, GroupStat } from '@/lib/types'
 import { GKEYS, GROUPS, PAIRS, ROUND_N } from '@/lib/data'
 import {
   groupStandings,
@@ -39,6 +39,7 @@ const INITIAL: AppState = {
 export default function Home() {
   const [state, setStateRaw] = useState<AppState>(INITIAL)
   const [officialResults, setOfficialResults] = useState<Record<string, string>>({})
+  const [groupStats, setGroupStats] = useState<Record<string, GroupStat>>({})
   const [predictionSaved, setPredictionSaved] = useState(false)
 
   // Official bracket results (bracket match IDs only)
@@ -120,7 +121,20 @@ export default function Home() {
         setOfficialResults(map)
       }
     }
+
+    async function fetchGroupStats() {
+      const { data } = await supabase
+        .from('group_stats')
+        .select('*')
+      if (data) {
+        const map: Record<string, GroupStat> = {}
+        data.forEach((s: GroupStat) => { map[s.team] = s })
+        setGroupStats(map)
+      }
+    }
+
     fetchOfficialResults()
+    fetchGroupStats()
 
     const channel = supabase
       .channel('official_results_realtime')
@@ -224,7 +238,7 @@ export default function Home() {
   function goTo(screen: Screen) {
     if (screen === 'thirds') {
       const th =
-        state.thirdsTouched && state.thirds.length ? state.thirds : suggested(state, officialResults)
+        state.thirdsTouched && state.thirds.length ? state.thirds : suggested(state, officialResults, groupStats)
       set({ screen, thirds: th, thirdsTouched: state.thirdsTouched })
       return
     }
@@ -302,7 +316,7 @@ export default function Home() {
   }
 
   function autoThirds() {
-    set({ thirds: suggested(state, officialResults), thirdsTouched: true })
+    set({ thirds: suggested(state, officialResults, groupStats), thirdsTouched: true })
   }
 
   function pickBracket(id: string, team: string) {
@@ -395,6 +409,7 @@ export default function Home() {
         <ThirdsScreen
           thirdsPool={thirdsPool}
           selected={state.thirds}
+          groupStats={groupStats}
           onToggle={toggleThird}
           onAutoThirds={autoThirds}
           onContinue={() => goTo('bracket')}

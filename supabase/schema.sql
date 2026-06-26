@@ -47,3 +47,24 @@ create policy "official_results_select" on public.official_results
 -- Go to Supabase Dashboard → Database → Replication → enable official_results
 -- Or run:
 -- alter publication supabase_realtime add table public.official_results;
+
+-- ── Group stats (auto-populated by sync-results Edge Function) ────────────────
+-- Stores real group-stage performance used for ranking the 8 best third-place
+-- teams by the proper FIFA criteria: Pts → GD → GF → conduct score → FIFA rank.
+create table if not exists public.group_stats (
+  team           text        primary key,
+  group_key      text        not null,
+  matches_played int         not null default 0,
+  points         int         not null default 0,
+  goals_for      int         not null default 0,
+  goals_against  int         not null default 0,
+  goal_diff      int         not null default 0,
+  yellow_cards   int         not null default 0,
+  red_cards      int         not null default 0,
+  updated_at     timestamptz          default now()
+);
+
+alter table public.group_stats enable row level security;
+
+create policy "group_stats_select" on public.group_stats
+  for select using (true);

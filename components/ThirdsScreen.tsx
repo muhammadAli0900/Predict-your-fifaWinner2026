@@ -3,6 +3,7 @@ import React from 'react'
 import Flag from './Flag'
 import { TEAM } from '@/lib/data'
 import { rank } from '@/lib/bracketEngine'
+import type { GroupStat } from '@/lib/types'
 
 interface ThirdEntry {
   team: string
@@ -12,6 +13,7 @@ interface ThirdEntry {
 interface ThirdsScreenProps {
   thirdsPool: ThirdEntry[]
   selected: string[]
+  groupStats: Record<string, GroupStat>
   onToggle: (team: string) => void
   onAutoThirds: () => void
   onContinue: () => void
@@ -20,6 +22,7 @@ interface ThirdsScreenProps {
 export default function ThirdsScreen({
   thirdsPool,
   selected,
+  groupStats,
   onToggle,
   onAutoThirds,
   onContinue,
@@ -65,8 +68,11 @@ export default function ThirdsScreen({
         }}
       >
         In the 48-team format, the 12 group winners and 12 runners-up qualify automatically — plus
-        the <b>8 best third-place teams</b>. Pick the 8 you think sneak through. I&apos;ve
-        pre-selected by FIFA ranking; adjust freely.
+        the <b>8 best third-place teams</b>. Ranked by FIFA criteria:{' '}
+        <b>points → goal diff → goals scored → fair play → FIFA rank</b>.
+        {Object.keys(groupStats).length > 0
+          ? ' Stats auto-pulled from live match data.'
+          : ' Stats will update as matches finish.'}
       </div>
 
       {/* Controls */}
@@ -139,6 +145,7 @@ export default function ThirdsScreen({
         {thirdsPool.map(({ team, group }) => {
           const on = selected.includes(team)
           const canAdd = !on && selected.length >= 8
+          const stat = groupStats[team]
 
           return (
             <div
@@ -158,9 +165,9 @@ export default function ThirdsScreen({
                 opacity: canAdd ? 0.5 : 1,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
                 <Flag name={team} height="1.4em" />
-                <div style={{ lineHeight: 1.15 }}>
+                <div style={{ lineHeight: 1.2, minWidth: 0 }}>
                   <div
                     style={{
                       fontFamily: "'Ubuntu', sans-serif",
@@ -171,9 +178,20 @@ export default function ThirdsScreen({
                   >
                     {team}
                   </div>
-                  <div style={{ fontSize: 12, color: '#9a9082' }}>
-                    3rd · Group {group} · FIFA #{rank(team)}
-                  </div>
+                  {stat ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 8px', marginTop: 3 }}>
+                      <StatChip label="GRP" value={`${group}`} color="#8a8170" />
+                      <StatChip label="PTS" value={`${stat.points}`} color="#1f8a60" />
+                      <StatChip label="GD" value={`${stat.goal_diff >= 0 ? '+' : ''}${stat.goal_diff}`} color={stat.goal_diff >= 0 ? '#2f6df0' : '#c0392b'} />
+                      <StatChip label="GF" value={`${stat.goals_for}`} color="#6a6256" />
+                      {stat.yellow_cards > 0 && <StatChip label="YC" value={`${stat.yellow_cards}`} color="#b08a3a" />}
+                      {stat.red_cards > 0 && <StatChip label="RC" value={`${stat.red_cards}`} color="#c0392b" />}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 12, color: '#9a9082', marginTop: 2 }}>
+                      3rd · Group {group} · FIFA #{rank(team)}
+                    </div>
+                  )}
                 </div>
               </div>
               <div
@@ -199,5 +217,14 @@ export default function ThirdsScreen({
         })}
       </div>
     </div>
+  )
+}
+
+function StatChip({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 11 }}>
+      <span style={{ color: '#b3a98f', fontWeight: 600, fontFamily: "'Roboto Condensed', sans-serif", letterSpacing: '.04em' }}>{label}</span>
+      <span style={{ color, fontWeight: 700 }}>{value}</span>
+    </span>
   )
 }

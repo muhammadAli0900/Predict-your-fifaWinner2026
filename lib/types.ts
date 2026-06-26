@@ -1,3 +1,15 @@
+export interface GroupStat {
+  team: string
+  group_key: string
+  matches_played: number
+  points: number
+  goals_for: number
+  goals_against: number
+  goal_diff: number
+  yellow_cards: number
+  red_cards: number
+}
+
 export type Screen = 'welcome' | 'groups' | 'thirds' | 'bracket' | 'results'
 export type Approach = 'match' | 'standings' | null
 
