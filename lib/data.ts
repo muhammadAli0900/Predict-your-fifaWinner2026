@@ -122,36 +122,36 @@ export const PAIRS: [number, number][] = [
   [0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2],
 ]
 
-// R32 bracket — official FIFA 2026 structure (matches 73-88)
+// R32 bracket — confirmed FIFA 2026 official matches (Match 73-88)
 export const R32: [string, string][] = [
-  ['2A', '2B'], // R32-0: Match 73
-  ['1E', 'T'],  // R32-1: Match 74
-  ['1F', '2C'], // R32-2: Match 75
-  ['1C', '2F'], // R32-3: Match 76
-  ['1I', 'T'],  // R32-4: Match 77
-  ['2E', '2I'], // R32-5: Match 78
-  ['1A', 'T'],  // R32-6: Match 79
-  ['1L', 'T'],  // R32-7: Match 80
-  ['1D', 'T'],  // R32-8: Match 81
-  ['1G', 'T'],  // R32-9: Match 82
-  ['2K', '2L'], // R32-10: Match 83
-  ['1H', '2J'], // R32-11: Match 84
-  ['1B', 'T'],  // R32-12: Match 85
-  ['1J', '2H'], // R32-13: Match 86
-  ['1K', 'T'],  // R32-14: Match 87
-  ['2D', '2G'], // R32-15: Match 88
+  ['2A', '2B'], // R32-0:  Jun 28 — South Africa vs Canada
+  ['1E', 'T'],  // R32-1:  Jun 29 — Germany vs [3rd A/B/C/D/F]
+  ['1F', '2C'], // R32-2:  Jun 29 — Netherlands vs Morocco
+  ['1C', '2F'], // R32-3:  Jun 29 — Brazil vs Japan
+  ['1I', 'T'],  // R32-4:  Jun 30 — France vs [3rd C/D/F/G/H]
+  ['2E', '2I'], // R32-5:  Jun 30 — Ivory Coast vs Norway
+  ['1A', 'T'],  // R32-6:  Jun 30 — Mexico vs [3rd C/E/F/H/I]
+  ['1L', 'T'],  // R32-7:  Jul 1  — England vs [3rd H]
+  ['1G', 'T'],  // R32-8:  Jul 1  — Egypt vs [3rd A/E/H/I/J]
+  ['1D', 'T'],  // R32-9:  Jul 1  — United States vs [3rd B/E/F/I/J]
+  ['1H', '2J'], // R32-10: Jul 2  — Spain vs Austria
+  ['1B', 'T'],  // R32-11: Jul 2  — Switzerland vs [3rd E/F/G/I/J]
+  ['2K', '2L'], // R32-12: Jul 2  — Portugal vs Ghana
+  ['2D', '2G'], // R32-13: Jul 3  — Australia vs Iran
+  ['1J', '2H'], // R32-14: Jul 3  — Argentina vs Uruguay
+  ['1K', 'T'],  // R32-15: Jul 3  — Colombia vs [3rd L]
 ]
 
-// Third-place wildcard slots [R32 slot index, allowed groups per FIFA combination table]
+// Third-place wildcard slots [R32 slot index, allowed groups] — confirmed FIFA 2026 combination table
 export const THIRD_SLOTS: [number, string[]][] = [
-  [1,  ['A', 'B', 'C', 'D', 'F']],
-  [4,  ['C', 'D', 'F', 'G', 'H']],
-  [6,  ['C', 'E', 'F', 'H', 'I']],
-  [7,  ['E', 'H', 'I', 'J', 'K']],
-  [8,  ['B', 'E', 'F', 'I', 'J']],
-  [9,  ['A', 'E', 'H', 'I', 'J']],
-  [12, ['E', 'F', 'G', 'I', 'J']],
-  [14, ['D', 'E', 'I', 'J', 'L']],
+  [1,  ['A', 'B', 'C', 'D', 'F']],   // R32-1:  Germany vs [3rd A/B/C/D/F]
+  [4,  ['C', 'D', 'F', 'G', 'H']],   // R32-4:  France vs [3rd C/D/F/G/H]
+  [6,  ['C', 'E', 'F', 'H', 'I']],   // R32-6:  Mexico vs [3rd C/E/F/H/I]
+  [7,  ['H']],                         // R32-7:  England vs [3rd H]
+  [8,  ['A', 'E', 'H', 'I', 'J']],   // R32-8:  Egypt vs [3rd A/E/H/I/J]
+  [9,  ['B', 'E', 'F', 'I', 'J']],   // R32-9:  United States vs [3rd B/E/F/I/J]
+  [11, ['E', 'F', 'G', 'I', 'J']],   // R32-11: Switzerland vs [3rd E/F/G/I/J]
+  [15, ['L']],                         // R32-15: Colombia vs [3rd L]
 ]
 
 export interface MatchVenue {
@@ -167,17 +167,17 @@ export const VENUES: Record<string, MatchVenue> = {
   'R32-2':  { date: 'Jun 29', stadium: 'Estadio BBVA',               city: 'Monterrey',         country: 'Mexico' },
   'R32-3':  { date: 'Jun 29', stadium: 'NRG Stadium',                city: 'Houston',           country: 'USA'    },
   'R32-4':  { date: 'Jun 30', stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },
-  'R32-5':  { date: 'Jun 30', stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R32-5':  { date: 'Jun 30', stadium: 'AT&T Stadium',               city: 'Arlington',         country: 'USA'    },
   'R32-6':  { date: 'Jun 30', stadium: 'Estadio Azteca',             city: 'Mexico City',       country: 'Mexico' },
   'R32-7':  { date: 'Jul 1',  stadium: 'Mercedes-Benz Stadium',      city: 'Atlanta',           country: 'USA'    },
-  'R32-8':  { date: 'Jul 1',  stadium: "Levi's Stadium",             city: 'San Francisco',     country: 'USA'    },
-  'R32-9':  { date: 'Jul 1',  stadium: 'Lumen Field',                city: 'Seattle',           country: 'USA'    },
-  'R32-10': { date: 'Jul 2',  stadium: 'BMO Field',                  city: 'Toronto',           country: 'Canada' },
-  'R32-11': { date: 'Jul 2',  stadium: 'SoFi Stadium',               city: 'Los Angeles',       country: 'USA'    },
-  'R32-12': { date: 'Jul 2',  stadium: 'BC Place',                   city: 'Vancouver',         country: 'Canada' },
-  'R32-13': { date: 'Jul 3',  stadium: 'Hard Rock Stadium',          city: 'Miami',             country: 'USA'    },
-  'R32-14': { date: 'Jul 3',  stadium: 'Arrowhead Stadium',          city: 'Kansas City',       country: 'USA'    },
-  'R32-15': { date: 'Jul 3',  stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R32-8':  { date: 'Jul 1',  stadium: 'Lumen Field',                city: 'Seattle',           country: 'USA'    },
+  'R32-9':  { date: 'Jul 1',  stadium: "Levi's Stadium",             city: 'Santa Clara',       country: 'USA'    },
+  'R32-10': { date: 'Jul 2',  stadium: 'SoFi Stadium',               city: 'Los Angeles',       country: 'USA'    },
+  'R32-11': { date: 'Jul 2',  stadium: 'BC Place',                   city: 'Vancouver',         country: 'Canada' },
+  'R32-12': { date: 'Jul 2',  stadium: 'BMO Field',                  city: 'Toronto',           country: 'Canada' },
+  'R32-13': { date: 'Jul 3',  stadium: 'AT&T Stadium',               city: 'Arlington',         country: 'USA'    },
+  'R32-14': { date: 'Jul 3',  stadium: 'Hard Rock Stadium',          city: 'Miami',             country: 'USA'    },
+  'R32-15': { date: 'Jul 3',  stadium: 'Arrowhead Stadium',          city: 'Kansas City',       country: 'USA'    },
   'R16-0':  { date: 'Jul 4',  stadium: 'Lincoln Financial Field',    city: 'Philadelphia',      country: 'USA'    },
   'R16-1':  { date: 'Jul 4',  stadium: 'NRG Stadium',                city: 'Houston',           country: 'USA'    },
   'R16-2':  { date: 'Jul 5',  stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },

@@ -174,6 +174,9 @@ export default function BracketScreen({
               {col.type === 'round' &&
                 col.matches!.map(m => (
                   <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {m.venue && (
+                      <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
+                    )}
                     <div style={m.cardStyle}>
                       <BracketTeamRow
                         team={m.top.team}
@@ -193,15 +196,22 @@ export default function BracketScreen({
                         onClick={m.bot.onClick}
                       />
                     </div>
-                    {m.venue && (
-                      <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
-                    )}
                   </div>
                 ))}
               {col.type === 'gutter' &&
                 col.cells!.map((cell, ci) => <div key={ci} style={cell.style} />)}
               {col.type === 'champ' && (
                 <div>
+                  {VENUES['F-0'] && (
+                    <div style={{ marginBottom: 8 }}>
+                      <VenueTag
+                        date={VENUES['F-0'].date}
+                        stadium={VENUES['F-0'].stadium}
+                        city={VENUES['F-0'].city}
+                        country={VENUES['F-0'].country}
+                      />
+                    </div>
+                  )}
                   <div style={champBoxStyle}>
                     <div
                       style={{
@@ -231,16 +241,6 @@ export default function BracketScreen({
                       {champ ?? 'TBD'}
                     </div>
                   </div>
-                  {VENUES['F-0'] && (
-                    <div style={{ marginTop: 8 }}>
-                      <VenueTag
-                        date={VENUES['F-0'].date}
-                        stadium={VENUES['F-0'].stadium}
-                        city={VENUES['F-0'].city}
-                        country={VENUES['F-0'].country}
-                      />
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -335,11 +335,16 @@ function ThirdPlacePlayoff({
           letterSpacing: '.18em',
           color: '#a9733c',
           fontWeight: 700,
-          marginBottom: 10,
+          marginBottom: 8,
         }}
       >
         🥉 THIRD-PLACE PLAYOFF
       </div>
+      {tpVenue && (
+        <div style={{ marginBottom: 6 }}>
+          <VenueTag date={tpVenue.date} stadium={tpVenue.stadium} city={tpVenue.city} country={tpVenue.country} />
+        </div>
+      )}
       <div
         style={{
           background: '#fff',
@@ -366,11 +371,6 @@ function ThirdPlacePlayoff({
           )
         })}
       </div>
-      {tpVenue && (
-        <div style={{ marginTop: 6 }}>
-          <VenueTag date={tpVenue.date} stadium={tpVenue.stadium} city={tpVenue.city} country={tpVenue.country} />
-        </div>
-      )}
       <div
         style={{ textAlign: 'center', fontSize: 13, color: '#a3946c', marginTop: 8 }}
       >
@@ -522,7 +522,7 @@ function buildColumns(
 
     if (ri < ROUNDS.length - 1) {
       const cnt = n / 2
-      const ch = H / n
+      const ch = H / cnt  // each bracket cell spans exactly 2 source-round slots
       const cells = Array.from({ length: cnt }, () => ({
         style: {
           height: ch,

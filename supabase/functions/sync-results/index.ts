@@ -36,24 +36,24 @@ const FIFA_RANK: Record<string, number> = {
 
 const PAIRS: [number, number][] = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]]
 
-// R32 bracket — official FIFA 2026 structure (matches 73-88)
+// R32 bracket — confirmed FIFA 2026 official matches (Match 73-88)
 const R32: [string, string][] = [
   ['2A','2B'], ['1E','T'],  ['1F','2C'], ['1C','2F'],
   ['1I','T'],  ['2E','2I'], ['1A','T'],  ['1L','T'],
-  ['1D','T'],  ['1G','T'],  ['2K','2L'], ['1H','2J'],
-  ['1B','T'],  ['1J','2H'], ['1K','T'],  ['2D','2G'],
+  ['1G','T'],  ['1D','T'],  ['1H','2J'], ['1B','T'],
+  ['2K','2L'], ['2D','2G'], ['1J','2H'], ['1K','T'],
 ]
 
-// [slot index, allowed groups] per FIFA combination table
+// [slot index, allowed groups] — confirmed FIFA 2026 combination table
 const THIRD_SLOTS: [number, string[]][] = [
   [1,  ['A','B','C','D','F']],
   [4,  ['C','D','F','G','H']],
   [6,  ['C','E','F','H','I']],
-  [7,  ['E','H','I','J','K']],
-  [8,  ['B','E','F','I','J']],
-  [9,  ['A','E','H','I','J']],
-  [12, ['E','F','G','I','J']],
-  [14, ['D','E','I','J','L']],
+  [7,  ['H']],
+  [8,  ['A','E','H','I','J']],
+  [9,  ['B','E','F','I','J']],
+  [11, ['E','F','G','I','J']],
+  [15, ['L']],
 ]
 
 const GKEYS = ['A','B','C','D','E','F','G','H','I','J','K','L']
