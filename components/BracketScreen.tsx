@@ -6,7 +6,7 @@ import type { MatchVenue } from '@/lib/data'
 import { teamsOf, better, rank } from '@/lib/bracketEngine'
 import type { AppState } from '@/lib/types'
 
-const H = 1600
+const H = 1280
 
 const ROUNDS: { key: string; label: string }[] = [
   { key: 'R32', label: 'Round of 32' },
@@ -147,7 +147,7 @@ export default function BracketScreen({
         }}
       >
         {/* Round labels */}
-        <div style={{ display: 'flex', alignItems: 'center', minWidth: 1240, padding: '0 6px 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: 1280, padding: '0 6px 8px' }}>
           {buildHeads(state, effectiveBracket, champ).map((hd, i) => (
             <div key={i} style={hd.style}>
               {hd.label && (
@@ -168,42 +168,46 @@ export default function BracketScreen({
         </div>
 
         {/* Columns + gutters */}
-        <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 1240, padding: '0 6px' }}>
+        <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 1280, padding: '0 6px' }}>
           {buildColumns(state, effectiveBracket, officialResults, champ, onPick).map((col, i) => (
             <div key={i} style={col.colStyle}>
               {col.type === 'round' &&
                 col.matches!.map(m => (
-                  <div key={m.id} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
-                    {m.venue && (
-                      <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
-                    )}
-                    <div style={m.cardStyle}>
-                      <BracketTeamRow
-                        team={m.top.team}
-                        picked={m.top.picked}
-                        decided={m.top.decided}
-                        empty={m.top.empty}
-                        locked={m.top.locked}
-                        onClick={m.top.onClick}
-                      />
-                      <div style={{ height: 1, background: '#ece2cf' }} />
-                      <BracketTeamRow
-                        team={m.bot.team}
-                        picked={m.bot.picked}
-                        decided={m.bot.decided}
-                        empty={m.bot.empty}
-                        locked={m.bot.locked}
-                        onClick={m.bot.onClick}
-                      />
+                  <div key={m.id} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ position: 'relative' }}>
+                      {m.venue && (
+                        <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 4 }}>
+                          <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />
+                        </div>
+                      )}
+                      <div style={m.cardStyle}>
+                        <BracketTeamRow
+                          team={m.top.team}
+                          picked={m.top.picked}
+                          decided={m.top.decided}
+                          empty={m.top.empty}
+                          locked={m.top.locked}
+                          onClick={m.top.onClick}
+                        />
+                        <div style={{ height: 1, background: '#ece2cf' }} />
+                        <BracketTeamRow
+                          team={m.bot.team}
+                          picked={m.bot.picked}
+                          decided={m.bot.decided}
+                          empty={m.bot.empty}
+                          locked={m.bot.locked}
+                          onClick={m.bot.onClick}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
               {col.type === 'gutter' &&
                 col.cells!.map((cell, ci) => <div key={ci} style={cell.style} />)}
               {col.type === 'champ' && (
-                <div>
+                <div style={{ position: 'relative' }}>
                   {VENUES['F-0'] && (
-                    <div style={{ marginBottom: 8 }}>
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 8 }}>
                       <VenueTag
                         date={VENUES['F-0'].date}
                         stadium={VENUES['F-0'].stadium}

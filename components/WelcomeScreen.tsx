@@ -76,6 +76,12 @@ export default function WelcomeScreen({
           value={nameInput}
           onChange={e => onNameChange(e.target.value)}
           placeholder="Enter your name"
+          name="prediction-name"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="words"
+          spellCheck={false}
+          data-form-type="other"
           style={{
             border: 'none',
             outline: 'none',
