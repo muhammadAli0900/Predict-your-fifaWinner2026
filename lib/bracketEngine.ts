@@ -1,4 +1,4 @@
-import { GROUPS, TEAM, PAIRS, R32, THIRD_SLOTS, GKEYS, R16_PAIRS } from './data'
+import { GROUPS, TEAM, PAIRS, R32, THIRD_SLOTS, GKEYS, R16_PAIRS, R32_ACTUAL_PAIRS } from './data'
 import type { AppState, GroupStat } from './types'
 
 type StateSlice = Pick<AppState, 'approach' | 'matchPicks' | 'ranks' | 'thirds'>
@@ -169,7 +169,7 @@ export function teamsOf(
   state: StateSlice,
   officialResults: Record<string, string> = {}
 ): [string | null, string | null] {
-  if (id.startsWith('R32-')) return r32Teams(state, officialResults)[+id.slice(4)]
+  if (id.startsWith('R32-')) return R32_ACTUAL_PAIRS[+id.slice(4)] as [string | null, string | null]
 
   if (id.startsWith('TP-')) {
     const lose = (k: number): string | null => {

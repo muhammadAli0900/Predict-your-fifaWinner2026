@@ -6,7 +6,7 @@ import type { MatchVenue } from '@/lib/data'
 import { teamsOf, better, rank } from '@/lib/bracketEngine'
 import type { AppState } from '@/lib/types'
 
-const H = 1280
+const H = 1600
 
 const ROUNDS: { key: string; label: string }[] = [
   { key: 'R32', label: 'Round of 32' },
@@ -147,7 +147,7 @@ export default function BracketScreen({
         }}
       >
         {/* Round labels */}
-        <div style={{ display: 'flex', alignItems: 'center', minWidth: 1280, padding: '0 6px 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: 1600, padding: '0 6px 8px' }}>
           {buildHeads(state, effectiveBracket, champ).map((hd, i) => (
             <div key={i} style={hd.style}>
               {hd.label && (
@@ -168,13 +168,16 @@ export default function BracketScreen({
         </div>
 
         {/* Columns + gutters */}
-        <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 1280, padding: '0 6px' }}>
+        <div style={{ display: 'flex', alignItems: 'stretch', minWidth: 1600, padding: '0 6px' }}>
           {buildColumns(state, effectiveBracket, officialResults, champ, onPick).map((col, i) => (
             <div key={i} style={col.colStyle}>
               {col.type === 'round' &&
                 col.matches!.map(m => (
                   <div key={m.id} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ position: 'relative' }}>
+                      {!m.id.startsWith('R32-') && (
+                        <div style={{ position: 'absolute', left: -28, top: '50%', width: 28, height: 2, background: '#d8c79e', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                      )}
                       {m.venue && (
                         <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 4 }}>
                           <VenueTag date={m.venue.date} stadium={m.venue.stadium} city={m.venue.city} country={m.venue.country} />

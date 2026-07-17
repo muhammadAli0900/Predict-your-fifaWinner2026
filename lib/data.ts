@@ -181,9 +181,9 @@ export const VENUES: Record<string, MatchVenue> = {
   'R16-0':  { date: 'Jul 4',  stadium: 'Lincoln Financial Field',    city: 'Philadelphia',      country: 'USA'    },
   'R16-1':  { date: 'Jul 4',  stadium: 'NRG Stadium',                city: 'Houston',           country: 'USA'    },
   'R16-2':  { date: 'Jul 5',  stadium: 'MetLife Stadium',            city: 'East Rutherford',   country: 'USA'    },
-  'R16-3':  { date: 'Jul 5',  stadium: 'Estadio Azteca',             city: 'Mexico City',       country: 'Mexico' },
+  'R16-3':  { date: 'Jul 6',  stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
   'R16-4':  { date: 'Jul 6',  stadium: 'Lumen Field',                city: 'Seattle',           country: 'USA'    },
-  'R16-5':  { date: 'Jul 6',  stadium: 'AT&T Stadium',               city: 'Dallas',            country: 'USA'    },
+  'R16-5':  { date: 'Jul 5',  stadium: 'Estadio Azteca',             city: 'Mexico City',       country: 'Mexico' },
   'R16-6':  { date: 'Jul 7',  stadium: 'Mercedes-Benz Stadium',      city: 'Atlanta',           country: 'USA'    },
   'R16-7':  { date: 'Jul 7',  stadium: 'BC Place',                   city: 'Vancouver',         country: 'Canada' },
   'QF-0':   { date: 'Jul 9',  stadium: 'Gillette Stadium',           city: 'Boston',            country: 'USA'    },
@@ -202,16 +202,36 @@ export const ROUND_N: Record<string, number> = {
 
 export const GKEYS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
+// Actual team names for each R32 slot — bypasses group-stage prediction derivation
+export const R32_ACTUAL_PAIRS: [string, string][] = [
+  ['South Africa', 'Canada'],                   // R32-0:  Canada won 1-0
+  ['Germany', 'Paraguay'],                      // R32-1:  Paraguay won 4-3 PKs
+  ['Netherlands', 'Morocco'],                   // R32-2:  Morocco won 3-2 PKs
+  ['Brazil', 'Japan'],                          // R32-3:  Brazil won
+  ['France', 'Sweden'],                         // R32-4:  France won
+  ['Ivory Coast', 'Norway'],                    // R32-5:  Norway won
+  ['Mexico', 'Ecuador'],                        // R32-6:  Mexico won 2-0
+  ['England', 'DR Congo'],                      // R32-7:  England won 2-1
+  ['Belgium', 'Senegal'],                       // R32-8:  Belgium won 3-2 ET
+  ['United States', 'Bosnia & Herzegovina'],    // R32-9:  USA won 2-0
+  ['Spain', 'Austria'],                         // R32-10: Spain won
+  ['Switzerland', 'Algeria'],                   // R32-11: Switzerland won 2-0
+  ['Portugal', 'Croatia'],                      // R32-12: Portugal won 2-1
+  ['Egypt', 'Australia'],                       // R32-13: Egypt won 4-2 PKs
+  ['Argentina', 'Uruguay'],                     // R32-14: Argentina won
+  ['Colombia', 'Ghana'],                        // R32-15: Colombia won 1-0
+]
+
 // Actual FIFA 2026 bracket: which two R32 slots feed each R16 slot
 export const R16_PAIRS: [number, number][] = [
-  [0, 2],   // R16-0: Canada vs Morocco
-  [1, 4],   // R16-1: Paraguay vs France
-  [10, 12], // R16-2: Spain vs Portugal
-  [9, 13],  // R16-3: USA vs Belgium
-  [6, 7],   // R16-4: Mexico vs England
-  [3, 5],   // R16-5: Brazil vs Norway
-  [8, 14],  // R16-6: Egypt vs Argentina
-  [11, 15], // R16-7: Switzerland vs Colombia
+  [0, 2],   // R16-0: Canada vs Morocco → Morocco won
+  [1, 4],   // R16-1: Paraguay vs France → France won
+  [10, 12], // R16-2: Spain vs Portugal → Spain won
+  [8, 9],   // R16-3: Belgium vs USA → Belgium won 4-1
+  [3, 5],   // R16-4: Brazil vs Norway → Norway won
+  [6, 7],   // R16-5: Mexico vs England → England won
+  [13, 14], // R16-6: Egypt vs Argentina → Argentina won
+  [11, 15], // R16-7: Switzerland vs Colombia → Switzerland won
 ]
 
 // All locked results through the semifinals
@@ -224,20 +244,20 @@ export const OFFICIAL_RESULTS: Record<string, string> = {
   'R32-5': 'Norway',
   'R32-6': 'Mexico',
   'R32-7': 'England',
-  'R32-8': 'Egypt',
+  'R32-8': 'Belgium',      // Belgium beat Senegal 3-2 ET
   'R32-9': 'United States',
   'R32-10': 'Spain',
   'R32-11': 'Switzerland',
   'R32-12': 'Portugal',
-  'R32-13': 'Belgium',
+  'R32-13': 'Egypt',        // Egypt beat Australia 4-2 PKs
   'R32-14': 'Argentina',
   'R32-15': 'Colombia',
   'R16-0': 'Morocco',
   'R16-1': 'France',
   'R16-2': 'Spain',
   'R16-3': 'Belgium',
-  'R16-4': 'England',
-  'R16-5': 'Norway',
+  'R16-4': 'Norway',        // Norway beat Brazil
+  'R16-5': 'England',       // England beat Mexico
   'R16-6': 'Argentina',
   'R16-7': 'Switzerland',
   'QF-0': 'France',
