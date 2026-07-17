@@ -201,3 +201,49 @@ export const ROUND_N: Record<string, number> = {
 }
 
 export const GKEYS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+
+// Actual FIFA 2026 bracket: which two R32 slots feed each R16 slot
+export const R16_PAIRS: [number, number][] = [
+  [0, 2],   // R16-0: Canada vs Morocco
+  [1, 4],   // R16-1: Paraguay vs France
+  [10, 12], // R16-2: Spain vs Portugal
+  [9, 13],  // R16-3: USA vs Belgium
+  [6, 7],   // R16-4: Mexico vs England
+  [3, 5],   // R16-5: Brazil vs Norway
+  [8, 14],  // R16-6: Egypt vs Argentina
+  [11, 15], // R16-7: Switzerland vs Colombia
+]
+
+// All locked results through the semifinals
+export const OFFICIAL_RESULTS: Record<string, string> = {
+  'R32-0': 'Canada',
+  'R32-1': 'Paraguay',
+  'R32-2': 'Morocco',
+  'R32-3': 'Brazil',
+  'R32-4': 'France',
+  'R32-5': 'Norway',
+  'R32-6': 'Mexico',
+  'R32-7': 'England',
+  'R32-8': 'Egypt',
+  'R32-9': 'United States',
+  'R32-10': 'Spain',
+  'R32-11': 'Switzerland',
+  'R32-12': 'Portugal',
+  'R32-13': 'Belgium',
+  'R32-14': 'Argentina',
+  'R32-15': 'Colombia',
+  'R16-0': 'Morocco',
+  'R16-1': 'France',
+  'R16-2': 'Spain',
+  'R16-3': 'Belgium',
+  'R16-4': 'England',
+  'R16-5': 'Norway',
+  'R16-6': 'Argentina',
+  'R16-7': 'Switzerland',
+  'QF-0': 'France',
+  'QF-1': 'Spain',
+  'QF-2': 'England',
+  'QF-3': 'Argentina',
+  'SF-0': 'Spain',
+  'SF-1': 'Argentina',
+}

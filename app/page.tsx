@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { AppState, Screen, GroupStat } from '@/lib/types'
-import { GKEYS, GROUPS, PAIRS, ROUND_N } from '@/lib/data'
+import { GKEYS, GROUPS, PAIRS, ROUND_N, OFFICIAL_RESULTS } from '@/lib/data'
 import {
   groupStandings,
   allComplete,
@@ -38,7 +38,7 @@ const INITIAL: AppState = {
 
 export default function Home() {
   const [state, setStateRaw] = useState<AppState>(INITIAL)
-  const [officialResults, setOfficialResults] = useState<Record<string, string>>({})
+  const [officialResults, setOfficialResults] = useState<Record<string, string>>(OFFICIAL_RESULTS)
   const [groupStats, setGroupStats] = useState<Record<string, GroupStat>>({})
   const [predictionSaved, setPredictionSaved] = useState(false)
 
@@ -118,7 +118,7 @@ export default function Home() {
         data.forEach((r: { match_id: string; winner: string }) => {
           map[r.match_id] = r.winner
         })
-        setOfficialResults(map)
+        setOfficialResults(prev => ({ ...OFFICIAL_RESULTS, ...prev, ...map }))
       }
     }
 
@@ -144,7 +144,7 @@ export default function Home() {
         (payload) => {
           const row = payload.new as { match_id: string; winner: string } | null
           if (row) {
-            setOfficialResults(prev => ({ ...prev, [row.match_id]: row.winner }))
+            setOfficialResults(prev => ({ ...OFFICIAL_RESULTS, ...prev, [row.match_id]: row.winner }))
           }
         }
       )

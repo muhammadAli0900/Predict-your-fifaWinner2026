@@ -1,4 +1,4 @@
-import { GROUPS, TEAM, PAIRS, R32, THIRD_SLOTS, GKEYS } from './data'
+import { GROUPS, TEAM, PAIRS, R32, THIRD_SLOTS, GKEYS, R16_PAIRS } from './data'
 import type { AppState, GroupStat } from './types'
 
 type StateSlice = Pick<AppState, 'approach' | 'matchPicks' | 'ranks' | 'thirds'>
@@ -184,7 +184,8 @@ export function teamsOf(
   let fp: [string, string]
   if (id.startsWith('R16-')) {
     const k = +id.slice(4)
-    fp = [`R32-${2 * k}`, `R32-${2 * k + 1}`]
+    const [a, b] = R16_PAIRS[k]
+    fp = [`R32-${a}`, `R32-${b}`]
   } else if (id.startsWith('QF-')) {
     const k = +id.slice(3)
     fp = [`R16-${2 * k}`, `R16-${2 * k + 1}`]
