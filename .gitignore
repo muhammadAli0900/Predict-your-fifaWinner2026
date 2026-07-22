@@ -16,6 +16,9 @@
 tsconfig.tsbuildinfo
 next-env.d.ts
 
+# Supabase CLI session files
+supabase/.temp/
+
 # Claude Code project files
 .claude/
 
